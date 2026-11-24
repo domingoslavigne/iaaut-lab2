@@ -1,5 +1,6 @@
 import numpy as np
 from funcoes_aux_proj_apr_supervisionada import extrair_atributos
+from sklearn.metrics import confusion_matrix, balanced_accuracy_score
 
 # R3.a) 
 class ArvoreDecisao:
@@ -114,4 +115,13 @@ def construir_matrizes_arvore(treino, teste):
     Xtest = np.vstack([extrair_atributos(seq) for seq in teste["Skeleton_Sequence"]])
 
     return Xtrain, Xtest
+
+
+# R3.d)
+def avaliar_classificacao(y_verdadeiro, y_previsto):
+    matriz = confusion_matrix(y_verdadeiro, y_previsto, labels=np.arange(5))
+    accuracy = balanced_accuracy_score(y_verdadeiro, y_previsto)
+
+    return matriz, accuracy
+
 
