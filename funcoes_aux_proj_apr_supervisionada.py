@@ -180,10 +180,10 @@ def imprimir_arvore(no, profundidade=0, nomes_atributos=None, idx_to_class=None)
     """
     recuo = "  " * profundidade
     if no.is_leaf_node():
-        if idx_to_class is not None and no.value in idx_to_class:
-            nome_classe = idx_to_class[no.value]
+        if idx_to_class is not None and no.valor in idx_to_class:
+            nome_classe = idx_to_class[no.valor]
         else:
-            nome_classe = f"Classe {no.value}"
+            nome_classe = f"Classe {no.valor}"
         print(f"{recuo}└── Folha: {nome_classe}")
         return
 
