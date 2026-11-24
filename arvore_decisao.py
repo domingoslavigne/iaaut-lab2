@@ -1,4 +1,5 @@
 import numpy as np
+from funcoes_aux_proj_apr_supervisionada import extrair_atributos
 
 # R3.a) 
 class ArvoreDecisao:
@@ -106,4 +107,11 @@ def separar_sequencias_arvore(df):
 
     return treino, teste, ytrain, ytest
 
+
+# R3.c)
+def construir_matrizes_arvore(treino, teste):
+    Xtrain = np.vstack([extrair_atributos(seq) for seq in treino["Skeleton_Sequence"]])
+    Xtest = np.vstack([extrair_atributos(seq) for seq in teste["Skeleton_Sequence"]])
+
+    return Xtrain, Xtest
 
