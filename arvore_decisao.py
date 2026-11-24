@@ -1,5 +1,4 @@
 import numpy as np
-#IMPORTE AS BIBLIOTECAS QUE PRECISAR
 
 class ArvoreDecisao:
     class Node:
@@ -11,26 +10,87 @@ class ArvoreDecisao:
             self.valor = valor
 
         def is_leaf_node(self):
-            return self.value is not None
+            return self.valor is not None
 
     def __init__(self, profundidade_maxima=None):
         self.profundidade_maxima = profundidade_maxima
         self.raiz = None
 
+    # Entropia
     def _entropy(self, y):
-    #TO DO - CÁLCULO DA ENTROPIA
-
+        _, contagens = np.unique(y, return_counts=True)
+        p = contagens / len(y)
+        return -np.sum(p * np.log2(p))
+    
+    # Informação mútua
     def _mutual_information(self, y, y_esquerda, y_direita):
-    #TO DO - CALCULO DA INFORMAÇÃO MUTUA
 
+        h = self._entropy(y)
+        h_esquerda = self._entropy(y_esquerda)
+        h_direita = self._entropy(y_direita)
+
+        return h - (len(y_esquerda) / len(y) * h_esquerda + len(y_direita) / len(y) * h_direita)
+        
+    # Melhor divisão
     def _best_split(self, X, y):
-    #TO DO - ENCONTRAR O MELHOR SPLIT
+        melhor_ganho = 0
+        melhor_feature = None
+        melhor_limiar = None
 
+        for feature in range(X.shape[1]):
+            valores = np.unique(X[:, feature])
+            limiares = (valores[:-1] + valores[1:]) / 2
+
+            for limiar in limiares:
+                mascara = X[:, feature] <= limiar
+
+                ganho = self._mutual_information(y, y[mascara], y[~mascara])
+
+                if ganho > melhor_ganho:
+                    melhor_ganho = ganho
+                    melhor_feature = feature
+                    melhor_limiar = limiar
+
+        return melhor_feature, melhor_limiar     
+
+    # Construção recursiva da árvore
     def _build_tree(self, X, y, profundidade=0):
-    # TO DO - CONSTRUIR A ARVORE
+        classes, contagens = np.unique(y, return_counts=True)
+        classe = classes[contagens == contagens.max()][-1]
 
+        if (len(classes) == 1 or (self.profundidade_maxima is not None and profundidade >= self.profundidade_maxima)):
+            return self.Node(valor=classe)
+
+        feature, limiar = self._best_split(X, y)
+
+        if feature is None:
+            return self.Node(valor=classe)
+
+        mascara = X[:, feature] <= limiar
+
+        esquerda = self._build_tree(X[mascara], y[mascara], profundidade + 1)
+        direita = self._build_tree(X[~mascara], y[~mascara], profundidade + 1)
+
+        return self.Node(feature, limiar, esquerda, direita)
+
+    # Treino
     def fit(self, X, y):
-    #TO DO - TREINAR A ARVORE
+        self.raiz = self._build_tree(X, y)
+        return self
 
+      # Previsão
     def predict(self, X):
-    #TO DO -  FAZER A PREDIÇÃO
+        previsoes = []
+
+        for linha in X:
+            no = self.raiz
+
+            while not no.is_leaf_node():
+                if linha[no.feature] <= no.limiar:
+                    no = no.esquerda
+                else:
+                    no = no.direita
+
+            previsoes.append(no.valor)
+
+        return np.array(previsoes)
