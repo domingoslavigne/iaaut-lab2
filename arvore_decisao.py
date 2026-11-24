@@ -1,5 +1,6 @@
 import numpy as np
 
+# R3.a) 
 class ArvoreDecisao:
     class Node:
         def __init__(self, feature=None, threshold=None, esquerda=None, direita=None, *, valor=None):
@@ -16,13 +17,11 @@ class ArvoreDecisao:
         self.profundidade_maxima = profundidade_maxima
         self.raiz = None
 
-    # Entropia
     def _entropy(self, y):
         _, contagens = np.unique(y, return_counts=True)
         p = contagens / len(y)
         return -np.sum(p * np.log2(p))
     
-    # Informação mútua
     def _mutual_information(self, y, y_esquerda, y_direita):
 
         h = self._entropy(y)
@@ -31,7 +30,6 @@ class ArvoreDecisao:
 
         return h - (len(y_esquerda) / len(y) * h_esquerda + len(y_direita) / len(y) * h_direita)
         
-    # Melhor divisão
     def _best_split(self, X, y):
         melhor_ganho = 0
         melhor_feature = None
@@ -53,7 +51,6 @@ class ArvoreDecisao:
 
         return melhor_feature, melhor_limiar     
 
-    # Construção recursiva da árvore
     def _build_tree(self, X, y, profundidade=0):
         classes, contagens = np.unique(y, return_counts=True)
         classe = classes[contagens == contagens.max()][-1]
@@ -73,12 +70,10 @@ class ArvoreDecisao:
 
         return self.Node(feature, limiar, esquerda, direita)
 
-    # Treino
     def fit(self, X, y):
         self.raiz = self._build_tree(X, y)
         return self
 
-      # Previsão
     def predict(self, X):
         previsoes = []
 
@@ -94,3 +89,21 @@ class ArvoreDecisao:
             previsoes.append(no.valor)
 
         return np.array(previsoes)
+
+# R3.b)
+def separar_sequencias_arvore(df):
+    sequencias = df[df["Patient_ID"] == 4]
+
+    n_treino = int(0.8 * len(sequencias))
+
+    treino = sequencias.iloc[:n_treino]
+    teste = sequencias.iloc[n_treino:]
+
+    classes = {"E1": 0, "E2": 1, "E3": 2, "E4": 3, "E5": 4}
+
+    ytrain = treino["Exercise_Id"].map(classes).to_numpy()
+    ytest = teste["Exercise_Id"].map(classes).to_numpy()
+
+    return treino, teste, ytrain, ytest
+
+
