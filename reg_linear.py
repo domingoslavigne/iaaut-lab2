@@ -33,7 +33,7 @@ def construir_matrizes(sequencias):
     X = np.vstack(X)
     Y = np.vstack(Y)
 
-    X = np.column_stack((X, np.ones(len(X))))   # adiciona coluna de 1s
+    X = np.column_stack((X, np.ones(len(X))))   # adiciona coluna de 1sc
 
     return X, Y
 
